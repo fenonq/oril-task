@@ -1,7 +1,7 @@
 package com.fenonq.oriltask.service;
 
 import com.fenonq.oriltask.model.enums.CryptocurrencyPair;
-import com.fenonq.oriltask.service.CryptocurrencyService;
+import com.fenonq.oriltask.repository.CryptocurrencyRepository;
 import com.opencsv.CSVWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,11 +13,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CSVConverter {
 
-    private final CryptocurrencyService cryptocurrencyService;
+    private final CryptocurrencyRepository cryptocurrencyRepository;
 
     public void convert() throws IOException {
-        FileWriter outputfile = new FileWriter("report.csv");
-        CSVWriter writer = new CSVWriter(outputfile,
+        FileWriter outputFile = new FileWriter("report.csv");
+        CSVWriter writer = new CSVWriter(outputFile,
                 CSVWriter.DEFAULT_SEPARATOR,
                 CSVWriter.NO_QUOTE_CHARACTER,
                 CSVWriter.DEFAULT_ESCAPE_CHARACTER,
@@ -32,8 +32,10 @@ public class CSVConverter {
 
             data = new String[]{
                     cryptocurrencyName,
-                    cryptocurrencyService.lowestPriceCryptocurrency(cryptocurrencyName).getLprice().toString(),
-                    cryptocurrencyService.highestPriceCryptocurrency(cryptocurrencyName).getLprice().toString()
+                    cryptocurrencyRepository.findFirstByCurr1OrderByLpriceAsc(cryptocurrencyName)
+                            .getLprice().toString(),
+                    cryptocurrencyRepository.findFirstByCurr1OrderByLpriceDesc(cryptocurrencyName)
+                            .getLprice().toString()
             };
             writer.writeNext(data);
         }

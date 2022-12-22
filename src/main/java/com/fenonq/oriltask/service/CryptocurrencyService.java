@@ -5,13 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.net.URISyntaxException;
-import java.util.Set;
+import java.util.List;
 
 public interface CryptocurrencyService {
 
-    Set<CryptocurrencyDto> loadDataToDatabase(String name,
-                                              Integer recordsNumber,
-                                              Integer timeout) throws InterruptedException, URISyntaxException;
+    List<CryptocurrencyDto> loadDataToDatabase(String name,
+                                               Integer recordsNumber,
+                                               Integer timeout) throws InterruptedException, URISyntaxException;
 
     CryptocurrencyDto lowestPriceCryptocurrency(String name);
 

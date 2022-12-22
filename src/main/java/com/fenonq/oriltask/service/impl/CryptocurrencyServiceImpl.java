@@ -17,10 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.fenonq.oriltask.util.Constants.URL;
@@ -33,11 +30,12 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
     private final RestTemplate restTemplate;
 
     @Override
-    public Set<CryptocurrencyDto> loadDataToDatabase(String name,
-                                                     Integer recordsNumber,
-                                                     Integer timeout) throws InterruptedException, URISyntaxException {
+    public List<CryptocurrencyDto> loadDataToDatabase(String name,
+                                                      Integer recordsNumber,
+                                                      Integer timeout) throws InterruptedException, URISyntaxException {
         CryptocurrencyPair pair = CryptocurrencyPair.getPair(name).orElseThrow(CryptocurrencyNotFoundException::new);
-        Set<CryptocurrencyDto> cryptocurrencyDtoSet = new HashSet<>();
+        List<CryptocurrencyDto> cryptocurrencyDtoSet = new ArrayList<>();
+
         for (int i = 0; i < recordsNumber; i++) {
             CryptocurrencyDto cryptocurrencyDto = restTemplate
                     .getForObject(new URI(URL + pair), CryptocurrencyDto.class);
@@ -47,6 +45,7 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
                     .save(CryptocurrencyMapper.INSTANCE.mapCryptocurrencyDtoToCryptocurrency(cryptocurrencyDto));
             Thread.sleep(timeout);
         }
+
         return cryptocurrencyDtoSet;
     }
 
