@@ -14,7 +14,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Set;
 
 @Api(tags = "Cryptocurrency management api")
 @RequestMapping("/api/v1/cryptocurrencies")

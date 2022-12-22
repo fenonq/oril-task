@@ -12,18 +12,23 @@ import org.springframework.web.method.HandlerMethod;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @RestControllerAdvice
 public class ErrorHandlingController {
 
     @ExceptionHandler(ServiceException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Error handleServiceException(ServiceException ex, HandlerMethod hm) {
+        log.error("handleServiceException: message: {}, method: {}", ex.getMessage(),
+                hm.getMethod(), ex);
         return new Error(ex.getMessage(), ex.getErrorType(), LocalDateTime.now());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Error handleException(Exception ex, HandlerMethod hm) {
+        log.error("handleException: message: {}, method: {}", ex.getMessage(),
+                hm.getMethod(), ex);
         return new Error(ex.getMessage(), ErrorType.FATAL_ERROR_TYPE, LocalDateTime.now());
     }
 
