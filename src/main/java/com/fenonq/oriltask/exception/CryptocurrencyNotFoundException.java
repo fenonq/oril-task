@@ -1,6 +1,9 @@
 package com.fenonq.oriltask.exception;
 
-public class CryptocurrencyNotFoundException extends RuntimeException {
+import com.fenonq.oriltask.model.enums.ErrorType;
+
+public class CryptocurrencyNotFoundException extends ServiceException {
+
     private static final String DEFAULT_MESSAGE = "Cryptocurrency is not found!";
 
     public CryptocurrencyNotFoundException() {
@@ -9,6 +12,11 @@ public class CryptocurrencyNotFoundException extends RuntimeException {
 
     public CryptocurrencyNotFoundException(String message) {
         super(message);
+    }
+
+    @Override
+    public ErrorType getErrorType() {
+        return ErrorType.VALIDATION_ERROR_TYPE;
     }
 
 }

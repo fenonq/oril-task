@@ -51,6 +51,7 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
 
     @Override
     public CryptocurrencyDto lowestPriceCryptocurrency(String name) {
+        CryptocurrencyPair.getPair(name).orElseThrow(CryptocurrencyNotFoundException::new);
         Cryptocurrency lowestPriceCryptocurrency =
                 cryptocurrencyRepository.findFirstByCurr1OrderByLpriceAsc(name.toUpperCase(Locale.ROOT));
         return CryptocurrencyMapper.INSTANCE.mapCryptocurrencyToCryptocurrencyDto(lowestPriceCryptocurrency);
@@ -58,6 +59,7 @@ public class CryptocurrencyServiceImpl implements CryptocurrencyService {
 
     @Override
     public CryptocurrencyDto highestPriceCryptocurrency(String name) {
+        CryptocurrencyPair.getPair(name).orElseThrow(CryptocurrencyNotFoundException::new);
         Cryptocurrency highestPriceCryptocurrency =
                 cryptocurrencyRepository.findFirstByCurr1OrderByLpriceDesc(name.toUpperCase(Locale.ROOT));
         return CryptocurrencyMapper.INSTANCE.mapCryptocurrencyToCryptocurrencyDto(highestPriceCryptocurrency);
