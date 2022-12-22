@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -56,7 +58,7 @@ public interface CryptocurrencyApi {
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
                     value = "Results page you want to retrieve (0..N)", defaultValue = "0"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
-                    value = "Number of records per page.", defaultValue = "5"),
+                    value = "Number of records per page.", defaultValue = "10"),
             @ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query",
                     value = "Sorting criteria in the format: property(,asc|desc). " +
                             "Default sort order is ascending. " +
@@ -66,7 +68,8 @@ public interface CryptocurrencyApi {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     Page<CryptocurrencyDto> findAll(@ApiIgnore("Ignored because swagger ui shows the wrong params")
-                                            Pageable pageable);
+                                    @PageableDefault(sort = {"lprice"},
+                                            direction = Sort.Direction.ASC) Pageable pageable);
 
     @ApiOperation("Generate a CSV report")
     @ResponseStatus(HttpStatus.OK)
