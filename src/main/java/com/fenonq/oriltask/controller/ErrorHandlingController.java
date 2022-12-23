@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class ErrorHandlingController {
 
     @ExceptionHandler(ServiceException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Error handleServiceException(ServiceException ex, HandlerMethod hm) {
         log.error("handleServiceException: message: {}, method: {}", ex.getMessage(),
                 hm.getMethod(), ex);

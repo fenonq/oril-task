@@ -1,6 +1,8 @@
 package com.fenonq.oriltask.controller;
 
 import com.fenonq.oriltask.dto.CryptocurrencyDto;
+import com.fenonq.oriltask.exception.CryptocurrencyNotFoundException;
+import com.fenonq.oriltask.model.enums.ErrorType;
 import com.fenonq.oriltask.service.CSVConverter;
 import com.fenonq.oriltask.service.CryptocurrencyService;
 import org.junit.jupiter.api.Test;
@@ -18,8 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static com.fenonq.oriltask.util.TestData.CRYPTOCURRENCY_URL;
-import static com.fenonq.oriltask.util.TestData.createCryptocurrencyDto;
+import static com.fenonq.oriltask.util.TestData.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -50,13 +51,47 @@ class CryptocurrencyControllerTest {
                 .thenReturn(cryptocurrencyDtos);
 
         mockMvc.perform(post(CRYPTOCURRENCY_URL)
-                        .queryParam("name", "BTC")
-                        .queryParam("recordsNumber", "3")
-                        .queryParam("timeout", "100"))
+                        .queryParam("name", NAME)
+                        .queryParam("recordsNumber", RECORDS_NUMBER.toString())
+                        .queryParam("timeout", TIMEOUT.toString()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].curr1").value(cryptocurrencyDtos.get(0).getCurr1()));
+        verify(cryptocurrencyService).loadDataToDatabase(anyString(), anyInt(), anyInt());
+    }
+
+    @Test
+    void loadDataCryptocurrencyNotFound() throws Exception {
+        when(cryptocurrencyService.loadDataToDatabase(anyString(), anyInt(), anyInt()))
+                .thenThrow(CryptocurrencyNotFoundException.class);
+
+        mockMvc.perform(post(CRYPTOCURRENCY_URL)
+                        .queryParam("name", WRONG_NAME)
+                        .queryParam("recordsNumber", RECORDS_NUMBER.toString())
+                        .queryParam("timeout", TIMEOUT.toString()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorType")
+                        .value(ErrorType.VALIDATION_ERROR_TYPE.name()));
+        verify(cryptocurrencyService).loadDataToDatabase(anyString(), anyInt(), anyInt());
+    }
+
+    @Test
+    void loadDataFatalError() throws Exception {
+        when(cryptocurrencyService.loadDataToDatabase(anyString(), anyInt(), anyInt()))
+                .thenThrow(RuntimeException.class);
+
+        mockMvc.perform(post(CRYPTOCURRENCY_URL)
+                        .queryParam("name", WRONG_NAME)
+                        .queryParam("recordsNumber", RECORDS_NUMBER.toString())
+                        .queryParam("timeout", TIMEOUT.toString()))
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorType")
+                        .value(ErrorType.FATAL_ERROR_TYPE.name()));
         verify(cryptocurrencyService).loadDataToDatabase(anyString(), anyInt(), anyInt());
     }
 
@@ -75,6 +110,20 @@ class CryptocurrencyControllerTest {
     }
 
     @Test
+    void lowestPriceCryptocurrencyNotFound() throws Exception {
+        when(cryptocurrencyService.lowestPriceCryptocurrency(anyString()))
+                .thenThrow(CryptocurrencyNotFoundException.class);
+
+        mockMvc.perform(get(CRYPTOCURRENCY_URL + "/minprice?name=BTC"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorType")
+                        .value(ErrorType.VALIDATION_ERROR_TYPE.name()));
+        verify(cryptocurrencyService).lowestPriceCryptocurrency(anyString());
+    }
+
+    @Test
     void highestPriceCryptocurrency() throws Exception {
         CryptocurrencyDto cryptocurrencyDto = createCryptocurrencyDto();
 
@@ -86,6 +135,22 @@ class CryptocurrencyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.curr1").value(cryptocurrencyDto.getCurr1()));
+        verify(cryptocurrencyService).highestPriceCryptocurrency(anyString());
+    }
+
+    @Test
+    void highestPriceCryptocurrencyNotFound() throws Exception {
+
+        when(cryptocurrencyService.highestPriceCryptocurrency(anyString()))
+                .thenThrow(CryptocurrencyNotFoundException.class);
+
+        mockMvc.perform(get(CRYPTOCURRENCY_URL + "/maxprice")
+                        .queryParam("name", "BTC"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorType")
+                        .value(ErrorType.VALIDATION_ERROR_TYPE.name()));
         verify(cryptocurrencyService).highestPriceCryptocurrency(anyString());
     }
 
