@@ -2,8 +2,8 @@ package com.fenonq.oriltask.controller;
 
 import com.fenonq.oriltask.api.CryptocurrencyApi;
 import com.fenonq.oriltask.dto.CryptocurrencyDto;
-import com.fenonq.oriltask.service.CSVConverter;
 import com.fenonq.oriltask.service.CryptocurrencyService;
+import com.fenonq.oriltask.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class CryptocurrencyController implements CryptocurrencyApi {
 
     private final CryptocurrencyService cryptocurrencyService;
-    private final CSVConverter converter;
+    private final ReportService reportService;
 
     public List<CryptocurrencyDto> loadData(String name,
                                             Integer recordsNumber,
@@ -50,7 +50,7 @@ public class CryptocurrencyController implements CryptocurrencyApi {
 
     public void csvReport() throws IOException {
         log.info("creating CSV report");
-        converter.convert();
+        reportService.CSVReport();
     }
 
 }

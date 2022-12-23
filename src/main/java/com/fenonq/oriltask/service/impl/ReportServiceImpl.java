@@ -1,7 +1,9 @@
-package com.fenonq.oriltask.service;
+package com.fenonq.oriltask.service.impl;
 
 import com.fenonq.oriltask.model.enums.CryptocurrencyPair;
 import com.fenonq.oriltask.repository.CryptocurrencyRepository;
+import com.fenonq.oriltask.service.ReportService;
+import com.fenonq.oriltask.util.Constants;
 import com.opencsv.CSVWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,21 +15,20 @@ import java.io.IOException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CSVConverter {
+public class ReportServiceImpl implements ReportService {
 
     private final CryptocurrencyRepository cryptocurrencyRepository;
 
-    public void convert() throws IOException {
+    public void CSVReport() throws IOException {
         log.info("creating CSV report");
-        FileWriter outputFile = new FileWriter("report.csv");
+        FileWriter outputFile = new FileWriter(Constants.CSV_FILE_NAME);
         CSVWriter writer = new CSVWriter(outputFile,
                 CSVWriter.DEFAULT_SEPARATOR,
                 CSVWriter.NO_QUOTE_CHARACTER,
                 CSVWriter.DEFAULT_ESCAPE_CHARACTER,
                 CSVWriter.DEFAULT_LINE_END);
 
-        String[] headers = new String[]{"Cryptocurrency Name", "Min Price", "Max Price"};
-        writer.writeNext(headers);
+        writer.writeNext(Constants.CSV_HEADERS);
 
         String[] data;
         for (CryptocurrencyPair cryptocurrencyPair : CryptocurrencyPair.values()) {
@@ -44,4 +45,5 @@ public class CSVConverter {
         }
         writer.close();
     }
+
 }

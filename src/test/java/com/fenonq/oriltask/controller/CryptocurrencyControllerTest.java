@@ -3,8 +3,8 @@ package com.fenonq.oriltask.controller;
 import com.fenonq.oriltask.dto.CryptocurrencyDto;
 import com.fenonq.oriltask.exception.CryptocurrencyNotFoundException;
 import com.fenonq.oriltask.model.enums.ErrorType;
-import com.fenonq.oriltask.service.CSVConverter;
 import com.fenonq.oriltask.service.CryptocurrencyService;
+import com.fenonq.oriltask.service.ReportService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ class CryptocurrencyControllerTest {
     private CryptocurrencyService cryptocurrencyService;
 
     @MockBean
-    private CSVConverter csvConverter;
+    private ReportService reportService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -130,7 +130,7 @@ class CryptocurrencyControllerTest {
         when(cryptocurrencyService.highestPriceCryptocurrency(anyString())).thenReturn(cryptocurrencyDto);
 
         mockMvc.perform(get(CRYPTOCURRENCY_URL + "/maxprice")
-                        .queryParam("name", "BTC"))
+                        .queryParam("name", NAME))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -145,7 +145,7 @@ class CryptocurrencyControllerTest {
                 .thenThrow(CryptocurrencyNotFoundException.class);
 
         mockMvc.perform(get(CRYPTOCURRENCY_URL + "/maxprice")
-                        .queryParam("name", "BTC"))
+                        .queryParam("name", NAME))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -182,12 +182,12 @@ class CryptocurrencyControllerTest {
 
     @Test
     void csvReport() throws Exception {
-        doNothing().when(csvConverter).convert();
+        doNothing().when(reportService).CSVReport();
 
         mockMvc.perform(get(CRYPTOCURRENCY_URL + "/csv"))
                 .andExpect(status().isOk());
 
-        verify(csvConverter).convert();
+        verify(reportService).CSVReport();
     }
 
 }
